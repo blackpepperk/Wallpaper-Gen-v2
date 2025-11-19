@@ -1,0 +1,5 @@
+{
+  "name": "MobiWall AI",
+  "description": "A mobile-first Korean wallpaper generator using Gemini Imagen 4.0.",
+  "requestFramePermissions": []
+}
