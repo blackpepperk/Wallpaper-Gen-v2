@@ -1,10 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 import { GeneratedImage } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Create a new instance for each call to ensure the latest API key is used
+const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateWallpapers = async (prompt: string): Promise<GeneratedImage[]> => {
   try {
+    const ai = getAI();
     const response = await ai.models.generateImages({
       model: 'imagen-4.0-generate-001',
       prompt: prompt,
@@ -29,5 +31,20 @@ export const generateWallpapers = async (prompt: string): Promise<GeneratedImage
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     throw new Error(error.message || "이미지 생성 중 오류가 발생했습니다.");
+  }
+};
+
+export const validateConnection = async (): Promise<boolean> => {
+  try {
+    const ai = getAI();
+    // Perform a lightweight check using a text model
+    await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: 'test',
+    });
+    return true;
+  } catch (error) {
+    console.error("Connection validation failed:", error);
+    return false;
   }
 };

@@ -6,12 +6,14 @@ import PromptInput from './components/PromptInput';
 import ImageGrid from './components/ImageGrid';
 import ImageViewer from './components/ImageViewer';
 import EmptyState from './components/EmptyState';
+import SettingsModal from './components/SettingsModal';
 import { AlertCircle } from 'lucide-react';
 
 const App: React.FC = () => {
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
   const [promptText, setPromptText] = useState('');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const [status, setStatus] = useState<GenerationState>({
     isLoading: false,
@@ -33,9 +35,9 @@ const App: React.FC = () => {
         isLoading: false, 
         error: error.message || "알 수 없는 오류가 발생했습니다." 
       });
-    } else {
-      setStatus({ isLoading: false, error: null });
     }
+    // Explicitly set loading to false in all cases
+    setStatus(prev => ({ ...prev, isLoading: false }));
   };
 
   const handleRemix = (prompt: string) => {
@@ -45,12 +47,12 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
-      <Header />
+      <Header onOpenSettings={() => setIsSettingsOpen(true)} />
 
       <main className="w-full max-w-md mx-auto">
         
         {status.error && (
-          <div className="mx-4 mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 text-red-400 text-sm">
+          <div className="mx-4 mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 text-red-400 text-sm animate-in fade-in slide-in-from-top-2">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <p>{status.error}</p>
           </div>
@@ -83,6 +85,11 @@ const App: React.FC = () => {
         image={selectedImage} 
         onClose={() => setSelectedImage(null)} 
         onRemix={handleRemix}
+      />
+
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
       />
     </div>
   );
